@@ -1,0 +1,4 @@
+/.idea
+/bin/*.exe
+/src/github.com
+/pkg
