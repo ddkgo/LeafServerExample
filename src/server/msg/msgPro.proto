@@ -1,0 +1,7 @@
+syntax = "proto3";
+package msg;
+
+message Hello {
+	int32 id = 1;
+	string name = 2;
+}
