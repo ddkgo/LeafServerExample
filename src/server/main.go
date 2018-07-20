@@ -4,6 +4,7 @@ import (
 	"github.com/name5566/leaf"
 	lconf "github.com/name5566/leaf/conf"
 	"server/conf"
+	_ "server/db/mongodb"
 	"server/game"
 	"server/gate"
 	"server/login"

@@ -2,11 +2,11 @@ package conf
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/name5566/leaf/log"
 	"io/ioutil"
-	"path/filepath"
 	"os"
-	"fmt"
+	"path/filepath"
 )
 
 var Server struct {
@@ -24,11 +24,11 @@ var Server struct {
 func init() {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		log.Fatal("%v",err)
+		log.Fatal("%v", err)
 	}
 	fmt.Println(dir)
 
-	data, err := ioutil.ReadFile(dir+"/conf/server.json")
+	data, err := ioutil.ReadFile(dir + "/conf/server.json")
 	if err != nil {
 		log.Fatal("%v", err)
 	}
