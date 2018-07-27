@@ -7,6 +7,9 @@ import (
 	"reflect"
 	"server/msg"
 	"regexp"
+	"server/db/mongodb"
+	"gopkg.in/mgo.v2/bson"
+	"fmt"
 )
 
 func init() {
@@ -40,7 +43,7 @@ func handleUserRegister(args []interface{}) {
 	m := args[0].(*msg.UserRegister)
 	a := args[1].(gate.Agent)
 	name :=m.GetLoginName()
-	//pwd :=m.GetLoginPW()
+	pwd :=m.GetLoginPW()
 	log.Debug("receive UserRegister name=%v", m.GetLoginName())
 
 	reg := regexp.MustCompile(`/^[a-zA-Z\d]\w{2,10}[a-zA-Z\d]$/`)
@@ -48,10 +51,32 @@ func handleUserRegister(args []interface{}) {
 	if(matched!=" "){
 		log.Debug("UserRegister name is licit", )
 	}
-	retBuf := &msg.UserResult{
-		RetResult: msg.Result_REGISTER_SUCCESS,
+	err := mongodbmgr.Find("game","login",bson.M{"name":name,})
+	if err == nil {
+		fmt.Println(err)
+		log.Debug("UserRegister find in fail", )
+		retBuf := &msg.UserResult{
+			RetResult: msg.Result_REGISTER_FAIL,
+			ErrorInfo:"账号已存在！",
+		}
+		a.WriteMsg(retBuf)
 	}
-	a.WriteMsg(retBuf)
+	err =mongodbmgr.Insert("game","login",bson.M{"name":name,"password":pwd})
+	if err != nil {
+		fmt.Println(err)
+		log.Debug("UserRegister write in fail", )
+		retBuf := &msg.UserResult{
+			RetResult: msg.Result_REGISTER_FAIL,
+			ErrorInfo:"注册失败，请稍后再试！",
+		}
+		a.WriteMsg(retBuf)
+	} else{
+		log.Debug("UserRegister write in success", )
+		retBuf := &msg.UserResult{
+			RetResult: msg.Result_REGISTER_SUCCESS,
+		}
+		a.WriteMsg(retBuf)
+	}
 }
 
 func handleUserLogin(args []interface{}) {
@@ -61,6 +86,7 @@ func handleUserLogin(args []interface{}) {
 
 	retBuf := &msg.UserResult{
 		RetResult: msg.Result_LOGIN_SUCCESS,
+		ErrorInfo:"登陆失败，请稍后再试！",
 	}
 	a.WriteMsg(retBuf)
 }
